@@ -1,0 +1,39 @@
+{
+  "Version": 1,
+  "Hash": "alNCmObfKlM8mpC2tXfIx81QmyJLh0oGVQ/0Z0IHBq8=",
+  "Source": "AUSBarcodeValidator",
+  "BasePath": "_content/AUSBarcodeValidator",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "AUSBarcodeValidator\\wwwroot",
+      "Source": "AUSBarcodeValidator",
+      "ContentRoot": "D:\\barcode\\AUSBarcodeValidator_ASPNET\\AUSBarcodeValidator\\wwwroot\\",
+      "BasePath": "_content/AUSBarcodeValidator",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "D:\\barcode\\AUSBarcodeValidator_ASPNET\\AUSBarcodeValidator\\wwwroot\\css\\site.css",
+      "SourceId": "AUSBarcodeValidator",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\barcode\\AUSBarcodeValidator_ASPNET\\AUSBarcodeValidator\\wwwroot\\",
+      "BasePath": "_content/AUSBarcodeValidator",
+      "RelativePath": "css/site.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\site.css"
+    }
+  ]
+}

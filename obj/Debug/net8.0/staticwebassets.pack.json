@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\barcode\\AUSBarcodeValidator_ASPNET\\AUSBarcodeValidator\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.AUSBarcodeValidator.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.AUSBarcodeValidator.props",
+      "PackagePath": "build\\AUSBarcodeValidator.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.AUSBarcodeValidator.props",
+      "PackagePath": "buildMultiTargeting\\AUSBarcodeValidator.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.AUSBarcodeValidator.props",
+      "PackagePath": "buildTransitive\\AUSBarcodeValidator.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

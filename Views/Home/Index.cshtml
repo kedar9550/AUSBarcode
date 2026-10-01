@@ -1,0 +1,478 @@
+@{
+    ViewData["Title"] = "AUS | Examcell PDF Barcode Validator";
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        .settings-toggle {
+            cursor: pointer;
+            font-size: 13px;
+            color: #0284c7;
+            font-weight: 600;
+            margin-top: 8px;
+            user-select: none;
+        }
+        .settings-box {
+            display: none;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px auto;
+            max-width: 540px;
+            text-align: left;
+            font-size: 12.5px;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .settings-grid label {
+            font-weight: 600;
+            color: #334155;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .settings-grid input, .settings-grid select {
+            width: 100%;
+            padding: 5px 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .action-btns-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .btn-pause {
+            background-color: #eab308;
+            color: #000;
+            padding: 8px 18px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .status-not-detected {
+            background-color: #fed7aa;
+            color: #9a3412;
+            border: 1px solid #fdba74;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- Header Matching Desktop GUI -->
+    <header class="app-header">
+        <div class="logo-tag">AUS</div>
+        <h1 class="app-title">Batch PDF Barcode Validator</h1>
+        <p class="app-subtitle">High-Precision .NET 8 Barcode Verification System (100% C# Engine)</p>
+    </header>
+
+    <!-- Main GUI Control Panel -->
+    <div class="gui-panel">
+        <form id="mainForm">
+            <!-- Hidden File Input for Folder Upload -->
+            <input id="folderInput" type="file" name="files" webkitdirectory directory multiple accept=".pdf,application/pdf" style="display: none;" />
+
+            <!-- Select Folder Button -->
+            <div>
+                <button id="btnSelectFolder" type="button" class="btn-select-folder">
+                    📁 Select Folder
+                </button>
+            </div>
+
+            <!-- Selected Folder Label -->
+            <div id="selectedFolderLabel" class="selected-folder-text">
+                No folder selected
+            </div>
+
+            <!-- Expected Page Count Input -->
+            <div class="input-group-custom">
+                <label class="input-label" for="expectedPages">Enter Expected Page Count:</label>
+                <input id="expectedPages" type="number" name="expectedPages" class="page-input" value="36" min="1" required />
+            </div>
+
+            <!-- Settings Accordion -->
+            <div class="settings-toggle" onclick="toggleSettings()">⚙ Advanced Detection Settings ▾</div>
+            <div id="settingsBox" class="settings-box">
+                <div class="settings-grid">
+                    <div>
+                        <label>Rendering DPI:</label>
+                        <select id="cfgDpi">
+                            <option value="200">200 DPI</option>
+                            <option value="250" selected>250 DPI (Recommended)</option>
+                            <option value="300">300 DPI (High Precision)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Retry DPI:</label>
+                        <select id="cfgRetryDpi">
+                            <option value="300" selected>300 DPI</option>
+                            <option value="350">350 DPI</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Barcode Format:</label>
+                        <select id="cfgFormat">
+                            <option value="CODE_128" selected>CODE_128 (Standard)</option>
+                            <option value="CODE_39">CODE_39</option>
+                            <option value="QR_CODE">QR Code</option>
+                            <option value="ALL">All Supported Formats</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Parallel Workers:</label>
+                        <select id="cfgWorkers">
+                            <option value="2">2 Workers</option>
+                            <option value="4" selected>4 Workers (Balanced)</option>
+                            <option value="8">8 Workers (Fast)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit / Action Buttons -->
+            <div class="action-btns-group">
+                <button id="actionBtn" type="submit" class="btn-action state-submit">
+                    Submit
+                </button>
+                <button id="pauseBtn" type="button" class="btn-pause" style="display: none;">
+                    ⏸ Pause
+                </button>
+            </div>
+
+            <!-- Status Label -->
+            <div id="statusLabel" class="status-label">
+                Status: Waiting for folder upload...
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div id="progressBar" class="progress-bar-fill"></div>
+            </div>
+
+            <!-- Timer Label -->
+            <div id="timerLabel" class="timer-label">
+                Completed: 00h 00m 00s
+                Remaining: 00h 00m 00s
+            </div>
+
+            <!-- Success Download Banner -->
+            <div id="successBanner" class="success-banner" style="display: none; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                <span id="successMsg" style="width: 100%; font-weight: 600;">Reports Generated:</span>
+                <a id="btnDownloadCsv" class="btn-download" href="#" download style="background: #0284c7;">
+                    📥 Download CSV Report
+                </a>
+                <a id="btnDownloadExcel" class="btn-download" href="#" download style="background: #16a34a;">
+                    📊 Download Excel (XLSX)
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Live Results Table Matching CSV Schema -->
+    <div class="results-section">
+        <div class="section-title">
+            <span>Validation Results Summary</span>
+            <span id="summaryCounts" style="font-size: 13px; font-weight: 500; color: #64748b;">Total: 0 | Valid: 0 | Mismatch: 0 | Invalid: 0</span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sr No</th>
+                        <th>Folder Name</th>
+                        <th>File Name</th>
+                        <th>Total PDFs</th>
+                        <th>Expected</th>
+                        <th>Total Pages</th>
+                        <th>Reference Barcode</th>
+                        <th>Mismatch Pages</th>
+                        <th>Mismatch Details</th>
+                        <th>Not Detected</th>
+                        <th>Missing Count</th>
+                        <th>Final Status</th>
+                        <th>Time (s)</th>
+                        <th>Processed Date</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <tr>
+                        <td colspan="14" style="text-align: center; color: #94a3b8; padding: 24px;">
+                            No PDFs processed yet. Click "Select Folder" and "Submit" to begin validation.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer class="app-footer">
+    Developed by IT Applications | 100% C# ZXing.Net Engine
+</footer>
+
+<script>
+    const form = document.getElementById('mainForm');
+    const folderInput = document.getElementById('folderInput');
+    const btnSelectFolder = document.getElementById('btnSelectFolder');
+    const selectedFolderLabel = document.getElementById('selectedFolderLabel');
+    const expectedPagesInput = document.getElementById('expectedPages');
+    const actionBtn = document.getElementById('actionBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const statusLabel = document.getElementById('statusLabel');
+    const progressBar = document.getElementById('progressBar');
+    const timerLabel = document.getElementById('timerLabel');
+    const successBanner = document.getElementById('successBanner');
+    const btnDownloadCsv = document.getElementById('btnDownloadCsv');
+    const btnDownloadExcel = document.getElementById('btnDownloadExcel');
+    const resultsBody = document.getElementById('resultsBody');
+    const summaryCounts = document.getElementById('summaryCounts');
+
+    let isProcessing = false;
+    let isPaused = false;
+    let cancelRequested = false;
+    let currentJobId = null;
+    let pollInterval = null;
+    let startTime = null;
+    let selectedFolderName = "";
+
+    function toggleSettings() {
+        const el = document.getElementById('settingsBox');
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    btnSelectFolder.addEventListener('click', () => {
+        folderInput.click();
+    });
+
+    folderInput.addEventListener('change', () => {
+        const files = Array.from(folderInput.files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
+        if (files.length === 0) {
+            selectedFolderLabel.textContent = "No folder selected";
+            return;
+        }
+
+        const firstFile = files[0];
+        if (firstFile.webkitRelativePath) {
+            selectedFolderName = firstFile.webkitRelativePath.split('/')[0];
+        } else {
+            selectedFolderName = "Selected Batch";
+        }
+
+        selectedFolderLabel.textContent = `Selected Folder: ${selectedFolderName} | Total PDFs: ${files.length}`;
+    });
+
+    pauseBtn.addEventListener('click', async () => {
+        if (!currentJobId) return;
+        await fetch(`/Home/TogglePause?id=${currentJobId}`, { method: 'POST' });
+        isPaused = !isPaused;
+        pauseBtn.textContent = isPaused ? "▶ Resume" : "⏸ Pause";
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (isProcessing) {
+            cancelRequested = true;
+            statusLabel.textContent = "Cancelling... ❌";
+            if (currentJobId) {
+                await fetch(`/Home/Cancel?id=${currentJobId}`, { method: 'POST' });
+            }
+            return;
+        }
+
+        const pdfFiles = Array.from(folderInput.files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
+        if (pdfFiles.length === 0) {
+            alert("Error: Select folder first!");
+            return;
+        }
+
+        const expected = parseInt(expectedPagesInput.value);
+        if (isNaN(expected) || expected <= 0) {
+            alert("Error: Enter valid expected page count!");
+            return;
+        }
+
+        isProcessing = true;
+        isPaused = false;
+        cancelRequested = false;
+        startTime = Date.now();
+
+        actionBtn.textContent = "Cancel";
+        actionBtn.className = "btn-action state-cancel";
+        pauseBtn.style.display = "inline-block";
+        pauseBtn.textContent = "⏸ Pause";
+        statusLabel.textContent = "Status: Starting validation...";
+        timerLabel.textContent = "Completed: 00h 00m 00s\nRemaining: 00h 00m 00s";
+        progressBar.style.width = "0%";
+        successBanner.style.display = "none";
+        resultsBody.innerHTML = `<tr><td colspan="14" style="text-align: center; color: #64748b; padding: 20px;">Processing PDFs with C# ZXing Engine... Please wait.</td></tr>`;
+
+        const formData = new FormData();
+        pdfFiles.forEach(f => formData.append("files", f));
+        formData.append("expectedPages", expected);
+        formData.append("dpi", document.getElementById('cfgDpi').value);
+        formData.append("retryDpi", document.getElementById('cfgRetryDpi').value);
+        formData.append("maxWorkers", document.getElementById('cfgWorkers').value);
+        formData.append("expectedFormat", document.getElementById('cfgFormat').value);
+
+        try {
+            const response = await fetch('/Home/Start', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const err = await response.text();
+                alert("Error: " + err);
+                resetToIdle();
+                return;
+            }
+
+            const data = await response.json();
+            currentJobId = data.jobId;
+
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(pollStatus, 700);
+            pollStatus();
+        } catch (err) {
+            alert("Error starting validation: " + err.message);
+            resetToIdle();
+        }
+    });
+
+    function digitalTime(totalSeconds) {
+        if (!totalSeconds || isNaN(totalSeconds) || totalSeconds < 0) return "00h 00m 00s";
+        const total = Math.floor(totalSeconds);
+        const hrs = String(Math.floor(total / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+        const secs = String(total % 60).padStart(2, '0');
+        return `${hrs}h ${mins}m ${secs}s`;
+    }
+
+    async function pollStatus() {
+        if (!currentJobId) return;
+
+        try {
+            const res = await fetch(`/Home/Status?id=${currentJobId}`);
+            if (!res.ok) return;
+
+            const data = await res.json();
+
+            if (data.status.startsWith("Processing")) {
+                statusLabel.textContent = `Status: ${data.status}`;
+            } else {
+                statusLabel.textContent = data.status;
+            }
+
+            progressBar.style.width = `${data.percent}%`;
+
+            if (!data.completed) {
+                const clientElapsed = Math.floor((Date.now() - startTime) / 1000);
+                const elapsedFormatted = data.elapsed || digitalTime(clientElapsed);
+                const remainingFormatted = data.remaining || "00h 00m 00s";
+                timerLabel.textContent = `Completed: ${elapsedFormatted}\nRemaining: ${remainingFormatted}`;
+            }
+
+            if (data.results && data.results.length > 0) {
+                renderTable(data.results);
+            }
+
+            if (data.summary) {
+                summaryCounts.textContent = `Total: ${data.summary.total} | Valid: ${data.summary.valid} | Mismatch: ${data.summary.mismatch} | Invalid: ${data.summary.invalid}`;
+            }
+
+            if (data.completed) {
+                clearInterval(pollInterval);
+                isProcessing = false;
+                actionBtn.textContent = "Submit";
+                actionBtn.className = "btn-action state-submit";
+                pauseBtn.style.display = "none";
+
+                const finalTotalTime = data.totalElapsed || digitalTime((Date.now() - startTime) / 1000);
+
+                if (data.status === "Process Cancelled ❌" || cancelRequested) {
+                    statusLabel.textContent = "Process Cancelled ❌";
+                } else {
+                    statusLabel.textContent = `Completed ✅ | Total PDFs Processed: ${data.processedFiles} of ${data.totalFiles}`;
+                    timerLabel.textContent = `Total Time: ${finalTotalTime}\nRemaining: 00h 00m 00s`;
+
+                    if (data.reportCsv || data.reportExcel) {
+                        btnDownloadCsv.href = `/Home/DownloadCsv?id=${currentJobId}`;
+                        btnDownloadExcel.href = `/Home/DownloadExcel?id=${currentJobId}`;
+                        successBanner.style.display = "flex";
+                    }
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function resetToIdle() {
+        isProcessing = false;
+        clearInterval(pollInterval);
+        actionBtn.textContent = "Submit";
+        actionBtn.className = "btn-action state-submit";
+        pauseBtn.style.display = "none";
+        statusLabel.textContent = "Status: Waiting for folder upload...";
+        progressBar.style.width = "0%";
+    }
+
+    function renderTable(results) {
+        if (!results || results.length === 0) return;
+
+        resultsBody.innerHTML = results.map(r => {
+            let badgeClass = "status-missing";
+            if (r.finalStatus === "VALID") badgeClass = "status-valid";
+            else if (r.finalStatus.includes("Mismatch")) badgeClass = "status-mismatch";
+            else if (r.finalStatus.includes("Not Detected")) badgeClass = "status-not-detected";
+            else if (r.finalStatus.includes("Pages Count")) badgeClass = "status-missing";
+            else if (r.finalStatus === "ERROR") badgeClass = "status-error";
+
+            return `
+                <tr>
+                    <td style="font-weight: 600; color: #64748b;">${r.srNo}</td>
+                    <td>${r.folderName}</td>
+                    <td style="font-weight: 600;">${r.fileName}</td>
+                    <td>${r.totalPdfsInFolder}</td>
+                    <td>${r.expectedPages}</td>
+                    <td>${r.totalPagesFound}</td>
+                    <td><code>${r.referenceBarcode}</code></td>
+                    <td style="color: ${r.mismatchPages !== '-' ? '#b91c1c' : '#64748b'}; font-weight: 600;">${r.mismatchPages}</td>
+                    <td style="font-size: 11.5px; color: #475569;">${r.mismatchDetails}</td>
+                    <td style="color: ${r.notDetectedPages !== '-' ? '#c2410c' : '#64748b'};">${r.notDetectedPages}</td>
+                    <td>${r.missingPagesCount}</td>
+                    <td><span class="badge-status ${badgeClass}">${r.finalStatus}</span></td>
+                    <td>${r.processingSeconds}s</td>
+                    <td style="font-size: 11.5px; color: #64748b; white-space: nowrap;">${formatDate(r.processedTime)}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return "-";
+        const d = new Date(dateStr);
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+</script>
+
+</body>
+</html>

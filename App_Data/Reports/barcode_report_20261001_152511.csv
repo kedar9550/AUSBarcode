@@ -1,0 +1,12 @@
+﻿Sr No,Folder Name,File Name,Total PDFs in Folder,Expected Pages,Total Pages Found,Reference Barcode,Mismatch Pages,Mismatch Details,Not Detected Pages,Missing Pages Count,Final Status,Processing Time (s),Processed Time
+1,Uploaded Folder,112025624.pdf,11,36,36,112025624,-,-,-,0,VALID,7.04,01-10-2026 15:25:02
+2,Uploaded Folder,112025625.pdf,11,36,36,112025625,-,-,-,0,VALID,7.04,01-10-2026 15:25:02
+3,Uploaded Folder,112025628.pdf,11,36,36,112025628,-,-,-,0,VALID,6.96,01-10-2026 15:25:02
+4,Uploaded Folder,12345.pdf,11,36,36,112025627,-,-,-,0,VALID,6.63,01-10-2026 15:25:01
+5,Uploaded Folder,2284386.pdf,11,36,12,2284386,-,-,-,24,INVALID (Pages Count not Match),1.96,01-10-2026 15:25:03
+6,Uploaded Folder,2512R015103.pdf,11,36,36,2512R015104,"5, 7, 9","Page 5: 2512R009641, Page 7: 2512R009641, Page 9: 2512R009641",-,0,INVALID (Barcode Mismatch),5.82,01-10-2026 15:25:07
+7,Uploaded Folder,2512R015104.pdf,11,36,36,2512R015104,"5, 7, 9","Page 5: 2512R009641, Page 7: 2512R009641, Page 9: 2512R009641",-,0,INVALID (Barcode Mismatch),6.23,01-10-2026 15:25:08
+8,Uploaded Folder,SEPARATOR0001.pdf,11,36,36,2607R000325,-,-,-,0,VALID,6,01-10-2026 15:25:08
+9,Uploaded Folder,SEPARATOR0002.pdf,11,36,36,2607R000315,-,-,-,0,VALID,5.23,01-10-2026 15:25:09
+10,Uploaded Folder,SEPARATOR0003.pdf,11,36,36,2607R000591,-,-,-,0,VALID,3.38,01-10-2026 15:25:11
+11,Uploaded Folder,vishnu.pdf,11,36,36,112025627,-,-,-,0,VALID,3.12,01-10-2026 15:25:11
